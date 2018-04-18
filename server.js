@@ -7,4 +7,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(3000, function () {
-  console.log(`Alex's and Kishan's app listening on port ${this.address()
+  console.log(`Alex's and Kishan's app listening on port ${this.address().port}`);
+});
