@@ -1,4 +1,5 @@
 let countriesData = [];
+let selectedRegion;
 let regions = [];
 let subRegions = [];
 
@@ -89,7 +90,13 @@ const populateCountryList = function (subRegion) {
   select.disabled = false;
   countriesData.forEach((country) => {
     const option = document.createElement('option');
-    if (subRegion === country.subregion) {
+    if (selectedRegion === 'other') {
+      selectedRegion = "";
+    }
+    if (selectedRegion === 'other') {
+      selectedRegion = "";
+    }
+    if (subRegion === country.subregion && country.region === selectedRegion) {
       option.textContent = country.name;
       option.value = country.alpha3Code;
       select.appendChild(option);
@@ -98,7 +105,12 @@ const populateCountryList = function (subRegion) {
 }
 
 const handleRegionChange = function (event) {
-  getSubRegions(this.value);
+  selectedRegion = this.value;
+  if (this.value === 'other') {
+    populateCountryList('')
+  } else {
+    getSubRegions(this.value);
+  }
 }
 
 const handleSubRegionChange = function (event) {
