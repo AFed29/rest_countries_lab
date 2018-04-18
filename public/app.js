@@ -1,3 +1,5 @@
+let countriesData = [];
+
 document.addEventListener('DOMContentLoaded', () => {
   const url = 'http://restcountries.eu/rest/v2/all';
   makeRequest(url, requestComplete);
@@ -18,14 +20,8 @@ const requestComplete = function () {
   if (this.status !== 200) return;
   const jsonString = this.responseText;
   const countries = JSON.parse(jsonString);
-  populateList(countries)
-}
-
-const countryDataReqComplete = function () {
-  if (this.status !== 200) return;
-  const jsonString = this.responseText;
-  const country = (JSON.parse(jsonString))[0];
-  populateCountryData(country);
+  populateList(countries);
+  countriesData = countries;
 }
 
 const populateList = function (countries) {
@@ -38,15 +34,17 @@ const populateList = function (countries) {
 }
 
 const handleCountryChange = function (event) {
-  getCountryData(this.value);
+  const country = getCountryData(this.value);
+  populateCountryData(country);
 }
 
-getCountryData = function (countryName) {
-  const url = `https://restcountries.eu/rest/v2/name/${ countryName }`
-  makeRequest(url, countryDataReqComplete);
+const getCountryData = function (countryName) {
+    return countriesData.find(function (country){
+    return country.name === countryName;
+    });
 }
 
-populateCountryData = function (country) {
+const populateCountryData = function (country) {
   const countryDataList = document.querySelector('#selected-country-data');
   countryDataList.innerHTML = ''
   const countryData = [];
