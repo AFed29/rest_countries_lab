@@ -1,12 +1,41 @@
 let countriesData = [];
+let regions = [];
+let subRegions = [];
 
 document.addEventListener('DOMContentLoaded', () => {
   const url = 'http://restcountries.eu/rest/v2/all';
   makeRequest(url, requestComplete);
 
-  const select = document.querySelector('#country-list');
-  select.addEventListener('change', handleCountryChange);
+  const regionSelect = document.querySelector('#region-list');
+  regionSelect.addEventListener('change', handleRegionChange);
+
+  const subRegionSelect = document.querySelector('#sub-region-list');
+  subRegionSelect.addEventListener('change', handleSubRegionChange);
+
+  const countrySelect = document.querySelector('#country-list');
+  countrySelect.addEventListener('change', handleCountryChange);
+
 });
+
+const getRegions = function () {
+  const uniqueRegions = new Set();
+  for (country of countriesData) {
+    uniqueRegions.add(country.region);
+  }
+  regions = Array.from(uniqueRegions);
+  populateRegionList();
+}
+
+const getSubRegions = function (region) {
+  const uniqueSubRegions = new Set();
+  for (country of countriesData) {
+    if (region === country.region) {
+      uniqueSubRegions.add(country.subregion);
+    }
+  }
+  subRegions = Array.from(uniqueSubRegions);
+  populateSubRegionList();
+}
 
 const makeRequest = function (url, callback) {
   const request = new XMLHttpRequest();
@@ -20,18 +49,60 @@ const requestComplete = function () {
   if (this.status !== 200) return;
   const jsonString = this.responseText;
   const countries = JSON.parse(jsonString);
-  populateList(countries);
   countriesData = countries;
+  getRegions();
 }
 
-const populateList = function (countries) {
-  const select = document.querySelector('#country-list');
-  countries.forEach((country) => {
+const populateRegionList = function () {
+  const select = document.querySelector('#region-list');
+  regions.forEach((region) => {
     const option = document.createElement('option');
-    option.textContent = country.name;
-    option.value = country.alpha3Code;
+    if (region === "") {
+      option.textContent = "other"
+    }
+    else {
+      option.textContent = region;
+    }
     select.appendChild(option);
+  })
+}
+
+const populateSubRegionList = function () {
+  const select = document.querySelector('#sub-region-list');
+  select.innerHTML = "<option disabled selected>Please select a sub-region</option>"
+  select.disabled = false;
+  subRegions.forEach((subRegion) => {
+    const option = document.createElement('option');
+    if (subRegion === "") {
+      option.textContent = "other"
+    }
+    else {
+      option.textContent = subRegion;
+    }
+    select.appendChild(option);
+  })
+}
+
+const populateCountryList = function (subRegion) {
+  const select = document.querySelector('#country-list');
+  select.innerHTML = "<option disabled selected>Please select a country</option>";
+  select.disabled = false;
+  countriesData.forEach((country) => {
+    const option = document.createElement('option');
+    if (subRegion === country.subregion) {
+      option.textContent = country.name;
+      option.value = country.alpha3Code;
+      select.appendChild(option);
+    }
   });
+}
+
+const handleRegionChange = function (event) {
+  getSubRegions(this.value);
+}
+
+const handleSubRegionChange = function (event) {
+  populateCountryList(this.value);
 }
 
 const handleCountryChange = function (event) {
@@ -41,9 +112,9 @@ const handleCountryChange = function (event) {
 }
 
 const getCountryData = function (alpha3Code) {
-    return countriesData.find(function (country){
+  return countriesData.find(function (country){
     return country.alpha3Code === alpha3Code;
-    });
+  });
 }
 
 const populateCountryData = function (country) {
