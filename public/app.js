@@ -2,10 +2,13 @@ let countriesData = [];
 let selectedRegion;
 let regions = [];
 let subRegions = [];
+let title;
 
 document.addEventListener('DOMContentLoaded', () => {
   const url = 'http://restcountries.eu/rest/v2/all';
   makeRequest(url, requestComplete);
+
+  title = document.querySelector('title');
 
   const regionSelect = document.querySelector('#region-list');
   regionSelect.addEventListener('change', handleRegionChange);
@@ -93,8 +96,8 @@ const populateCountryList = function (subRegion) {
     if (selectedRegion === 'other') {
       selectedRegion = "";
     }
-    if (selectedRegion === 'other') {
-      selectedRegion = "";
+    if (subRegion === 'other') {
+      subRegion = "";
     }
     if (subRegion === country.subregion && country.region === selectedRegion) {
       option.textContent = country.name;
@@ -130,6 +133,7 @@ const getCountryData = function (alpha3Code) {
 }
 
 const populateCountryData = function (country) {
+  title.textContent = country.name
   const countryDataList = document.querySelector('#selected-country-data');
   countryDataList.innerHTML = ''
   const countryData = {};
